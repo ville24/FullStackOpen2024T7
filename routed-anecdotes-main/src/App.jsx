@@ -77,7 +77,8 @@ const CreateNew = (props) => {
     })
   }
 
-  const handleReset = () => {
+  const handleReset = (e) => {
+    e.preventDefault()
     content.onReset()
     author.onReset()
     info.onReset()
@@ -86,7 +87,7 @@ const CreateNew = (props) => {
   return (
     <div>
       <h2>create a new anecdote</h2>
-      {/*<form>*/}
+      <form onSubmit={handleSubmit}>
         <div>
           content
           <input {...content}/>
@@ -99,9 +100,9 @@ const CreateNew = (props) => {
           url for more info
           <input {...info}/>
         </div>
-        <button onClick={handleSubmit}>create</button>
+        <button>create</button>
         <button onClick={handleReset}>reset</button>
-      {/*</form>*/}
+      </form>
     </div>
   )
 
@@ -132,6 +133,7 @@ const App = () => {
     anecdote.id = Math.round(Math.random() * 10000)
     setAnecdotes(anecdotes.concat(anecdote))
     setNewAnecdote(true)
+    setTimeout(() => setNewAnecdote(false), 100)
     setNotification('A new anecdote ' + anecdote.content + ' created!')
     setTimeout(() => setNotification(''), 5000)
   }
