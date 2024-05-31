@@ -1,53 +1,29 @@
 {
   "notes": [
     {
-      "id": 1,
+      "id": "1",
       "content": "custom-hooks are awesome!"
     },
     {
-      "id": 2,
+      "id": "2",
       "content": "best feature ever <3"
-    },
-    {
-      "content": "fsdf",
-      "id": 3
-    },
-    {
-      "content": "fsdf",
-      "id": 4
-    },
-    {
-      "content": "fsdfs",
-      "id": 5
-    },
-    {
-      "content": "fsfdsfsdfsdf",
-      "id": 6
-    },
-    {
-      "content": "rrr",
-      "id": 7
-    },
-    {
-      "content": "eee",
-      "id": 8
     }
   ],
   "persons": [
     {
-      "id": 1,
+      "id": "1",
       "name": "mluukkai",
       "number": "040-5483923"
     },
     {
-      "id": 2,
+      "id": "2",
       "name": "hellas",
       "number": "012-123123"
     },
     {
-      "name": "hjkhjk",
-      "number": "",
-      "id": 3
+      "id": "f235",
+      "name": "Teppo Testaaja",
+      "number": "12345678"
     }
   ]
 }

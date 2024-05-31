@@ -19,25 +19,14 @@ const useResource = (baseUrl) => {
   const [resources, setResources] = useState([])
 
   useEffect(() => {
-    axios.get(baseUrl, {headers: {
-    'Access-Control-Allow-Origin': '*',
-    'Access-Control-Allow-Credentials': 'true',
-    'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, locale',
-    'Access-Control-Allow-Methods': 'GET, POST',
-  }}). then(res => {
+    axios.get(baseUrl). then(res => {
     setResources(res.data)
   })
   
   },[])
 
   const create = async (resource) => {
-    console.log('create')
-    const response = await axios.post(baseUrl, resource, {headers: {
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers': 'Origin, Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, locale',
-      'Access-Control-Allow-Methods': 'GET, POST',
-    }})
+    const response = await axios.post(baseUrl, resource)
     resource.id = Math.round(Math.random() * 10000)
     setResources(resources.concat(resource))
   }
@@ -56,11 +45,8 @@ const App = () => {
   const name = useField('text')
   const number = useField('text')
   
-  const [notes, noteService] = useResource('https://didactic-train-wx6prvp5vp7c5569-3005.app.github.dev/notes')
-  const [persons, personService] = useResource('https://didactic-train-wx6prvp5vp7c5569-3005.app.github.dev/persons')
-
-  //const [notes, noteService] = useResource('http://localhost:3005/notes')
-  //const [persons, personService] = useResource('http://localhost:3005/persons')
+  const [notes, noteService] = useResource('http://localhost:3005/notes')
+  const [persons, personService] = useResource('http://localhost:3005/persons')
 
   const handleNoteSubmit = (event) => {
     event.preventDefault()
@@ -71,7 +57,7 @@ const App = () => {
     event.preventDefault()
     personService.create({ name: name.value, number: number.value})
   }
-  console.log(notes)
+
   return (
     <div>
       <h2>notes</h2>
