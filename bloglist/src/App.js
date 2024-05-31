@@ -1,4 +1,8 @@
 import { useState, useEffect, useRef } from 'react'
+import { useReducer } from 'react'
+import BlogsContext from './BlogsContext'
+import notificationReducer from './reducers/notificationReducer'
+
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -14,8 +18,11 @@ const App = () => {
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
-  const [notificationMessage, setNotificationMessage] = useState('')
   const blogFormRef = useRef()
+  const [notificationMessage, notificationDispatch] = useReducer(
+    notificationReducer,
+    null,
+  )
 
   useEffect(() => {
     blogService.getAll().then((blogs) => setBlogs(blogs))
@@ -36,9 +43,12 @@ const App = () => {
       .create(blogObject)
       .then((returnedBlog) => {
         setBlogs(blogs.concat(returnedBlog))
-        setNotificationMessage(`Blog ${returnedBlog.title} added`)
+        notificationDispatch({
+          type: 'notificationShow',
+          payload: `Blog ${returnedBlog.title} added`,
+        })
         setTimeout(() => {
-          setNotificationMessage(null)
+          notificationDispatch({ type: 'notificationHide', payload: null })
         }, 2000)
       })
       .catch(() => {
@@ -58,9 +68,12 @@ const App = () => {
             blog.id !== returnedBlog.id ? blog : returnedBlog,
           ),
         )
-        setNotificationMessage(`Blog ${returnedBlog.title} updated`)
+        notificationDispatch({
+          type: 'notificationShow',
+          payload: `Blog ${returnedBlog.title} updated`,
+        })
         setTimeout(() => {
-          setNotificationMessage(null)
+          notificationDispatch({ type: 'notificationHide', payload: null })
         }, 2000)
       })
       .catch(() => {
@@ -76,9 +89,12 @@ const App = () => {
       .remove(id)
       .then(() => {
         setBlogs(blogs.filter((blog) => blog.id !== id && blog))
-        setNotificationMessage('Blog deleted')
+        notificationDispatch({
+          type: 'notificationShow',
+          payload: 'Blog deleted',
+        })
         setTimeout(() => {
-          setNotificationMessage(null)
+          notificationDispatch({ type: 'notificationHide', payload: null })
         }, 2000)
       })
       .catch(() => {
@@ -109,9 +125,12 @@ const App = () => {
       setUser(user)
       setUsername('')
       setPassword('')
-      setNotificationMessage(`User ${user.name} logged in`)
+      notificationDispatch({
+        type: 'notificationShow',
+        payload: `User ${user.name} logged in`,
+      })
       setTimeout(() => {
-        setNotificationMessage(null)
+        notificationDispatch({ type: 'notificationHide', payload: null })
       }, 2000)
     } catch (exception) {
       setErrorMessage('wrong username or password')
@@ -126,9 +145,12 @@ const App = () => {
     try {
       window.localStorage.removeItem('loggedBlogappUser')
       setUser(null)
-      setNotificationMessage(`User ${user.name} logged out`)
+      notificationDispatch({
+        type: 'notificationShow',
+        payload: `User ${user.name} logged out`,
+      })
       setTimeout(() => {
-        setNotificationMessage(null)
+        notificationDispatch({ type: 'notificationHide', payload: null })
       }, 2000)
     } catch (exception) {
       setErrorMessage(`User ${user.name} logged failed`)
@@ -139,54 +161,56 @@ const App = () => {
   }
 
   return (
-    <div>
-      <h2>blogs</h2>
-      {errorMessage && (
-        <ErrorMessage errorMessage={errorMessage}></ErrorMessage>
-      )}
-      {notificationMessage && (
-        <NotificationMessage
-          notificationMessage={notificationMessage}
-        ></NotificationMessage>
-      )}
-      {user === null && (
-        <LoginForm
-          username={username}
-          password={password}
-          handleLogin={handleLogin}
-          handleUsernameChange={handleUsernameChange}
-          handlePasswordChange={handlePasswordChange}
-        ></LoginForm>
-      )}
-      {user && (
-        <>
-          <div>
-            {user.name} logged in
-            <form onSubmit={handleLogout} style={{ display: 'inline' }}>
-              <button type="submit" id="logoutbutton">
-                logout
-              </button>
-            </form>
-          </div>
-          <Togglable buttonLabel="new blog" ref={blogFormRef}>
-            <BlogForm createBlog={addBlog} />
-          </Togglable>
-          <div>
-            {blogs
-              .sort((a, b) => b.likes - a.likes)
-              .map((blog) => (
-                <Blog
-                  key={blog.id}
-                  blog={blog}
-                  user={user}
-                  updateBlog={updateBlog}
-                  removeBlog={removeBlog}
-                />
-              ))}
-          </div>
-        </>
-      )}
-    </div>
+    <BlogsContext.Provider value={[notificationMessage, notificationDispatch]}>
+      <div>
+        <h2>blogs</h2>
+        {errorMessage && (
+          <ErrorMessage errorMessage={errorMessage}></ErrorMessage>
+        )}
+        {notificationMessage && (
+          <NotificationMessage
+            notificationMessage={notificationMessage}
+          ></NotificationMessage>
+        )}
+        {user === null && (
+          <LoginForm
+            username={username}
+            password={password}
+            handleLogin={handleLogin}
+            handleUsernameChange={handleUsernameChange}
+            handlePasswordChange={handlePasswordChange}
+          ></LoginForm>
+        )}
+        {user && (
+          <>
+            <div>
+              {user.name} logged in
+              <form onSubmit={handleLogout} style={{ display: 'inline' }}>
+                <button type="submit" id="logoutbutton">
+                  logout
+                </button>
+              </form>
+            </div>
+            <Togglable buttonLabel="new blog" ref={blogFormRef}>
+              <BlogForm createBlog={addBlog} />
+            </Togglable>
+            <div>
+              {blogs
+                .sort((a, b) => b.likes - a.likes)
+                .map((blog) => (
+                  <Blog
+                    key={blog.id}
+                    blog={blog}
+                    user={user}
+                    updateBlog={updateBlog}
+                    removeBlog={removeBlog}
+                  />
+                ))}
+            </div>
+          </>
+        )}
+      </div>
+    </BlogsContext.Provider>
   )
 }
 

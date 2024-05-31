@@ -1,9 +1,8 @@
-import PropTypes from 'prop-types'
+import { useContext } from 'react'
+import BlogsContext from '../BlogsContext'
 
-const notificationMessage = (props) => {
-  notificationMessage.propTypes = {
-    notificationMessage: PropTypes.string.isRequired,
-  }
+const NotificationMessage = () => {
+  const [notificationMessage, notificationDispatch] = useContext(BlogsContext)
 
   const notificationStyle = {
     color: 'green',
@@ -18,8 +17,8 @@ const notificationMessage = (props) => {
   }
   return (
     <div style={notificationStyle} className="info">
-      {props.notificationMessage}
+      {notificationMessage}
     </div>
   )
 }
-export default notificationMessage
+export default NotificationMessage
