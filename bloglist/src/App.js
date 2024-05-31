@@ -3,6 +3,9 @@ import { useReducer } from 'react'
 import BlogsContext from './BlogsContext'
 import notificationReducer from './reducers/notificationReducer'
 
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { getBlogs, createBlog, updateBlog, removeBlog } from './requests'
+
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
@@ -13,7 +16,6 @@ import blogService from './services/blogs'
 import loginService from './services/login'
 
 const App = () => {
-  const [blogs, setBlogs] = useState([])
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
@@ -24,9 +26,73 @@ const App = () => {
     null,
   )
 
-  useEffect(() => {
-    blogService.getAll().then((blogs) => setBlogs(blogs))
-  }, [])
+  const queryClient = useQueryClient()
+  const result = useQuery({
+    queryKey: ['blogs'],
+    queryFn: getBlogs,
+    refetchOnWindowFocus: false,
+  })
+
+  const blogs = result.data
+
+  const newBlogMutation = useMutation({
+    mutationFn: createBlog,
+    onSuccess: (newBlog) => {
+      const blogs = queryClient.getQueryData(['blogs'])
+      queryClient.setQueryData(['blogs'], blogs.concat(newBlog))
+      notificationDispatch({
+        type: 'notificationShow',
+        payload: `Blog ${newBlog.title} added`,
+      })
+      setTimeout(() => {
+        notificationDispatch({ type: 'notificationHide', payload: null })
+      }, 2000)
+    },
+    onError: () => {
+      setErrorMessage(`Saving blog failed.`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 2000)
+    },
+  })
+
+  const updateBlogMutation = useMutation({ mutationFn: updateBlog, 
+    onSuccess: (updatedBlog) => {
+      queryClient.invalidateQueries(['blogs'])
+      notificationDispatch({
+        type: 'notificationShow',
+        payload: `Blog ${updatedBlog.title} updated`,
+      })
+      setTimeout(() => {
+        notificationDispatch({ type: 'notificationHide', payload: null })
+      }, 2000)
+    },
+    onError: () => {
+      setErrorMessage(`Updating blog failed.`)
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 2000)
+    }
+  })
+
+  const removeBlogMutation = useMutation({ mutationFn: removeBlog, 
+    onSuccess: (updatedBlog) => {
+      queryClient.invalidateQueries(['blogs'])
+      notificationDispatch({
+        type: 'notificationShow',
+        payload: 'Blog deleted',
+      })
+      setTimeout(() => {
+        notificationDispatch({ type: 'notificationHide', payload: null })
+      }, 2000)
+    },
+    onError: () => {
+      setErrorMessage('Deleting blog failed.')
+      setTimeout(() => {
+        setErrorMessage(null)
+      }, 2000)
+    }
+  })
 
   useEffect(() => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
@@ -39,70 +105,15 @@ const App = () => {
 
   const addBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility()
-    blogService
-      .create(blogObject)
-      .then((returnedBlog) => {
-        setBlogs(blogs.concat(returnedBlog))
-        notificationDispatch({
-          type: 'notificationShow',
-          payload: `Blog ${returnedBlog.title} added`,
-        })
-        setTimeout(() => {
-          notificationDispatch({ type: 'notificationHide', payload: null })
-        }, 2000)
-      })
-      .catch(() => {
-        setErrorMessage(`Saving blog ${blogObject.title} failed.`)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 2000)
-      })
+    newBlogMutation.mutate({ newBlog: blogObject, user: user })
   }
 
-  const updateBlog = (blogObject) => {
-    blogService
-      .update(blogObject)
-      .then((returnedBlog) => {
-        setBlogs(
-          blogs.map((blog) =>
-            blog.id !== returnedBlog.id ? blog : returnedBlog,
-          ),
-        )
-        notificationDispatch({
-          type: 'notificationShow',
-          payload: `Blog ${returnedBlog.title} updated`,
-        })
-        setTimeout(() => {
-          notificationDispatch({ type: 'notificationHide', payload: null })
-        }, 2000)
-      })
-      .catch(() => {
-        setErrorMessage(`Updating blog ${blogObject.title} failed.`)
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 2000)
-      })
+  const handleupdateBlog = (blogObject) => {
+    updateBlogMutation.mutate({ updateBlog: blogObject, user: user })
   }
 
-  const removeBlog = (id) => {
-    blogService
-      .remove(id)
-      .then(() => {
-        setBlogs(blogs.filter((blog) => blog.id !== id && blog))
-        notificationDispatch({
-          type: 'notificationShow',
-          payload: 'Blog deleted',
-        })
-        setTimeout(() => {
-          notificationDispatch({ type: 'notificationHide', payload: null })
-        }, 2000)
-      })
-      .catch(() => {
-        setErrorMessage('Deleting blog failed.')
-        setTimeout(() => {
-          setErrorMessage(null)
-        }, 2000)
-      })
+  const handleRemoveBlog = (id) => {
+    removeBlogMutation.mutate({ id: id, user: user })
   }
 
   const handleUsernameChange = (event) => {
@@ -195,17 +206,18 @@ const App = () => {
               <BlogForm createBlog={addBlog} />
             </Togglable>
             <div>
-              {blogs
-                .sort((a, b) => b.likes - a.likes)
-                .map((blog) => (
-                  <Blog
-                    key={blog.id}
-                    blog={blog}
-                    user={user}
-                    updateBlog={updateBlog}
-                    removeBlog={removeBlog}
-                  />
-                ))}
+              {blogs &&
+                blogs
+                  .sort((a, b) => b.likes - a.likes)
+                  .map((blog) => (
+                    <Blog
+                      key={blog.id}
+                      blog={blog}
+                      user={user}
+                      updateBlog={handleupdateBlog}
+                      removeBlog={handleRemoveBlog}
+                    />
+                  ))}
             </div>
           </>
         )}
