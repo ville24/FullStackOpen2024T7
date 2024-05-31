@@ -54,7 +54,7 @@ describe('when there is initially one user at db', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length + 1)
 
-    const usernames = usersAtEnd.map(u => u.username)
+    const usernames = usersAtEnd.map((u) => u.username)
     expect(usernames).toContain(newUser.username)
   })
 })
@@ -65,7 +65,7 @@ describe('test username and password validity', () => {
 
     const newUser = {
       name: 'Teppo Testaaja',
-      password: 'salasana'
+      password: 'salasana',
     }
 
     const result = await api
@@ -106,7 +106,7 @@ describe('test username and password validity', () => {
     const newUser = {
       username: 'tt',
       name: 'Teppo Testaaja',
-      password: 'salasana'
+      password: 'salasana',
     }
 
     const result = await api
@@ -118,7 +118,9 @@ describe('test username and password validity', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
 
-    expect(result.body.error).toContain('User validation failed: username: Path `username` (`tt`) is shorter than the minimum allowed length (3).')
+    expect(result.body.error).toContain(
+      'User validation failed: username: Path `username` (`tt`) is shorter than the minimum allowed length (3).',
+    )
   })
 
   test('creation fails if password is too short', async () => {
@@ -127,7 +129,7 @@ describe('test username and password validity', () => {
     const newUser = {
       username: 'ttestaaj',
       name: 'Teppo Testaaja',
-      password: 'pw'
+      password: 'pw',
     }
 
     const result = await api
@@ -139,7 +141,8 @@ describe('test username and password validity', () => {
     const usersAtEnd = await helper.usersInDb()
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
 
-    expect(result.body.error).toContain('Path `password` is shorter than the minimum allowed length (3).')
-
+    expect(result.body.error).toContain(
+      'Path `password` is shorter than the minimum allowed length (3).',
+    )
   })
 })

@@ -11,14 +11,13 @@ describe('BlogForm', () => {
 
     const container = render(<BlogForm createBlog={createBlog} />).container
 
-
-    const titleField = container.querySelector('[name=\'title\']')
+    const titleField = container.querySelector("[name='title']")
     await user.type(titleField, 'React patterns')
 
-    const authorField = container.querySelector('[name=\'author\']')
+    const authorField = container.querySelector("[name='author']")
     await user.type(authorField, 'Michael Chan')
 
-    const urlField = container.querySelector('[name=\'url\']')
+    const urlField = container.querySelector("[name='url']")
     await user.type(urlField, 'https://reactpatterns.com/')
 
     const button = screen.getByText('create')

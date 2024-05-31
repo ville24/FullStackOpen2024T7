@@ -11,5 +11,5 @@ module.exports = {
   TEST_MONGODB_URI,
   PORT,
   PASSWORD,
-  SECRET
+  SECRET,
 }

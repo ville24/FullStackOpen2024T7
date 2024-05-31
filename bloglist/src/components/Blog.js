@@ -2,12 +2,11 @@ import { useState } from 'react'
 import PropTypes from 'prop-types'
 
 const Blog = ({ blog, user, updateBlog, removeBlog }) => {
-
   Blog.propTypes = {
     blog: PropTypes.object.isRequired,
     user: PropTypes.object.isRequired,
     updateBlog: PropTypes.func.isRequired,
-    removeBlog: PropTypes.func.isRequired
+    removeBlog: PropTypes.func.isRequired,
   }
 
   const [visible, setVisible] = useState(false)
@@ -23,7 +22,7 @@ const Blog = ({ blog, user, updateBlog, removeBlog }) => {
     paddingLeft: 2,
     border: 'solid',
     borderWidth: 1,
-    marginBottom: 5
+    marginBottom: 5,
   }
 
   const handleLike = (event) => {
@@ -32,10 +31,10 @@ const Blog = ({ blog, user, updateBlog, removeBlog }) => {
     updateBlog({
       id: blog.id,
       title: blog.title,
-      author:blog. author,
+      author: blog.author,
       url: blog.url,
       likes: blog.likes + 1,
-      user: blog.user.id
+      user: blog.user.id,
     })
   }
 
@@ -46,22 +45,30 @@ const Blog = ({ blog, user, updateBlog, removeBlog }) => {
   }
 
   return (
-    <div style={blogStyle} className='blog'>
+    <div style={blogStyle} className="blog">
       <p>
         <span>{blog.title}</span>
         <span> </span>
         <span>{blog.author}</span>
-        <button onClick={toggleVisibility} className='viewbutton'>view</button>
+        <button onClick={toggleVisibility} className="viewbutton">
+          view
+        </button>
       </p>
-      <div style={showWhenVisible} className='blogDetails'>
+      <div style={showWhenVisible} className="blogDetails">
         <button onClick={toggleVisibility}>hide</button>
         <p>{blog.url}</p>
-        <p className='likes'>{blog.likes} <button onClick={handleLike} className='likebutton'>like</button></p>
+        <p className="likes">
+          {blog.likes}{' '}
+          <button onClick={handleLike} className="likebutton">
+            like
+          </button>
+        </p>
         <p>{blog.user.name}</p>
-        {
-          user.username === blog.user.username &&
-          <button onClick={handleRemove} className='removebutton'>remove</button>
-        }
+        {user.username === blog.user.username && (
+          <button onClick={handleRemove} className="removebutton">
+            remove
+          </button>
+        )}
       </div>
     </div>
   )

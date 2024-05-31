@@ -1,9 +1,8 @@
 import PropTypes from 'prop-types'
 
 const ErrorMessage = (props) => {
-
   ErrorMessage.propTypes = {
-    errorMessage: PropTypes.string.isRequired
+    errorMessage: PropTypes.string.isRequired,
   }
 
   const errorStyle = {
@@ -15,10 +14,12 @@ const ErrorMessage = (props) => {
     borderStyle: 'solid',
     borderColor: 'red',
     borderRadius: 5,
-    backgroundColor: 'lightGray'
+    backgroundColor: 'lightGray',
   }
   return (
-    <div style={errorStyle} className='error'>{props.errorMessage}</div>
+    <div style={errorStyle} className="error">
+      {props.errorMessage}
+    </div>
   )
 }
 export default ErrorMessage

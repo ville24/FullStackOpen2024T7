@@ -13,16 +13,23 @@ describe('Blog', () => {
     likes: 7,
     user: {
       name: 'Matti Meikäläinen',
-      username: 'mmeikala'
-    }
+      username: 'mmeikala',
+    },
   }
   const user = {
     name: 'Matti Meikäläinen',
-    username: 'mmeikala'
+    username: 'mmeikala',
   }
 
   beforeEach(() => {
-    container = render(<Blog blog={blog} user={user} updateBlog={() => {}} removeBlog={() => {}} />).container
+    container = render(
+      <Blog
+        blog={blog}
+        user={user}
+        updateBlog={() => {}}
+        removeBlog={() => {}}
+      />,
+    ).container
   })
 
   test('renders content', () => {
@@ -54,19 +61,25 @@ describe('Blog udpdate', () => {
       likes: 7,
       user: {
         name: 'Matti Meikäläinen',
-        username: 'mmeikala'
-      }
+        username: 'mmeikala',
+      },
     }
     const user = {
       name: 'Matti Meikäläinen',
-      username: 'mmeikala'
+      username: 'mmeikala',
     }
-
 
     const userClick = userEvent.setup()
     const updateBlog = jest.fn()
 
-    render(<Blog blog={blog} user={user}  updateBlog={updateBlog} removeBlog={() => {}} />)
+    render(
+      <Blog
+        blog={blog}
+        user={user}
+        updateBlog={updateBlog}
+        removeBlog={() => {}}
+      />,
+    )
 
     const button = screen.getByText('like')
     await userClick.click(button)

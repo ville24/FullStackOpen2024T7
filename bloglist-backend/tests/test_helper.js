@@ -5,18 +5,16 @@ const User = require('../models/user')
 
 const usersInDb = async () => {
   const users = await User.find({})
-  return users.map(u => u.toJSON())
+  return users.map((u) => u.toJSON())
 }
 
-const userLogin = async() => {
+const userLogin = async () => {
   const newUser = {
     username: 'mmeikala',
     password: 'salasana',
   }
 
-  const res = await api
-    .post('/api/login')
-    .send(newUser)
+  const res = await api.post('/api/login').send(newUser)
 
   const token = res.body.token
 
@@ -24,5 +22,5 @@ const userLogin = async() => {
 }
 module.exports = {
   usersInDb,
-  userLogin
+  userLogin,
 }

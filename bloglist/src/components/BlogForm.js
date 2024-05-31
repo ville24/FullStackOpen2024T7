@@ -7,7 +7,7 @@ const BlogForm = ({ createBlog }) => {
   const [url, setUrl] = useState('')
 
   BlogForm.propTypes = {
-    createBlog: PropTypes.func.isRequired
+    createBlog: PropTypes.func.isRequired,
   }
 
   const handleSaveNew = async (event) => {
@@ -16,7 +16,7 @@ const BlogForm = ({ createBlog }) => {
     createBlog({
       title: title,
       author: author,
-      url: url
+      url: url,
     })
 
     setTitle('')
@@ -37,7 +37,7 @@ const BlogForm = ({ createBlog }) => {
           />
         </div>
         <div>
-        author:
+          author:
           <input
             type="text"
             value={author}
@@ -46,7 +46,7 @@ const BlogForm = ({ createBlog }) => {
           />
         </div>
         <div>
-        url:
+          url:
           <input
             type="text"
             value={url}
@@ -54,7 +54,9 @@ const BlogForm = ({ createBlog }) => {
             onChange={({ target }) => setUrl(target.value)}
           />
         </div>
-        <button type="submit" id="createblog">create</button>
+        <button type="submit" id="createblog">
+          create
+        </button>
       </form>
     </div>
   )
