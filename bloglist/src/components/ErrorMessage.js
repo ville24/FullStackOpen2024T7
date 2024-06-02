@@ -1,9 +1,9 @@
-import PropTypes from 'prop-types'
+import { useContext } from 'react'
+import BlogsContext from '../BlogsContext'
 
-const ErrorMessage = (props) => {
-  ErrorMessage.propTypes = {
-    errorMessage: PropTypes.string.isRequired,
-  }
+const ErrorMessage = () => {
+
+  const [errorMessage] = useContext(BlogsContext)
 
   const errorStyle = {
     color: 'red',
@@ -18,7 +18,7 @@ const ErrorMessage = (props) => {
   }
   return (
     <div style={errorStyle} className="error">
-      {props.errorMessage}
+      {errorMessage}
     </div>
   )
 }

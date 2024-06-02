@@ -2,6 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useReducer } from 'react'
 import BlogsContext from './BlogsContext'
 import notificationReducer from './reducers/notificationReducer'
+import errorMessageReducer from './reducers/errorMessageReducer'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getBlogs, createBlog, updateBlog, removeBlog } from './requests'
@@ -19,10 +20,14 @@ const App = () => {
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
   const [user, setUser] = useState(null)
-  const [errorMessage, setErrorMessage] = useState('')
+  //const [errorMessage, setErrorMessage] = useState('')
   const blogFormRef = useRef()
   const [notificationMessage, notificationDispatch] = useReducer(
     notificationReducer,
+    null,
+  )
+  const [errorMessage, errorMessageDispatch] = useReducer(
+    errorMessageReducer,
     null,
   )
 
@@ -49,14 +54,22 @@ const App = () => {
       }, 2000)
     },
     onError: () => {
-      setErrorMessage(`Saving blog failed.`)
+      errorMessageDispatch({
+        type: 'errorMessageShow',
+        payload: `Saving blog failed.`,
+      })
+      setTimeout(() => {
+        errorMessageDispatch({ type: 'errorMessageHide', payload: null })
+      }, 2000)
+      /*setErrorMessage(`Saving blog failed.`)
       setTimeout(() => {
         setErrorMessage(null)
-      }, 2000)
+      }, 2000)*/
     },
   })
 
-  const updateBlogMutation = useMutation({ mutationFn: updateBlog, 
+  const updateBlogMutation = useMutation({
+    mutationFn: updateBlog,
     onSuccess: (updatedBlog) => {
       queryClient.invalidateQueries(['blogs'])
       notificationDispatch({
@@ -68,14 +81,15 @@ const App = () => {
       }, 2000)
     },
     onError: () => {
-      setErrorMessage(`Updating blog failed.`)
+      /*setErrorMessage(`Updating blog failed.`)
       setTimeout(() => {
         setErrorMessage(null)
-      }, 2000)
-    }
+      }, 2000)*/
+    },
   })
 
-  const removeBlogMutation = useMutation({ mutationFn: removeBlog, 
+  const removeBlogMutation = useMutation({
+    mutationFn: removeBlog,
     onSuccess: (updatedBlog) => {
       queryClient.invalidateQueries(['blogs'])
       notificationDispatch({
@@ -87,11 +101,11 @@ const App = () => {
       }, 2000)
     },
     onError: () => {
-      setErrorMessage('Deleting blog failed.')
+      /*setErrorMessage('Deleting blog failed.')
       setTimeout(() => {
         setErrorMessage(null)
-      }, 2000)
-    }
+      }, 2000)*/
+    },
   })
 
   useEffect(() => {
@@ -103,7 +117,7 @@ const App = () => {
     }
   }, [])
 
-  const addBlog = (blogObject) => {
+  const handleAddBlog = (blogObject) => {
     blogFormRef.current.toggleVisibility()
     newBlogMutation.mutate({ newBlog: blogObject, user: user })
   }
@@ -144,10 +158,10 @@ const App = () => {
         notificationDispatch({ type: 'notificationHide', payload: null })
       }, 2000)
     } catch (exception) {
-      setErrorMessage('wrong username or password')
+      /*setErrorMessage('wrong username or password')
       setTimeout(() => {
         setErrorMessage(null)
-      }, 2000)
+      }, 2000)*/
     }
   }
 
@@ -164,25 +178,24 @@ const App = () => {
         notificationDispatch({ type: 'notificationHide', payload: null })
       }, 2000)
     } catch (exception) {
-      setErrorMessage(`User ${user.name} logged failed`)
+      /*setErrorMessage(`User ${user.name} logged failed`)
       setTimeout(() => {
         setErrorMessage(null)
-      }, 2000)
+      }, 2000)*/
     }
   }
 
   return (
-    <BlogsContext.Provider value={[notificationMessage, notificationDispatch]}>
+    <BlogsContext.Provider
+      value={
+        ([notificationMessage, notificationDispatch],
+        [errorMessage, errorMessageDispatch])
+      }
+    >
       <div>
         <h2>blogs</h2>
-        {errorMessage && (
-          <ErrorMessage errorMessage={errorMessage}></ErrorMessage>
-        )}
-        {notificationMessage && (
-          <NotificationMessage
-            notificationMessage={notificationMessage}
-          ></NotificationMessage>
-        )}
+        {errorMessage && <ErrorMessage></ErrorMessage>}
+        {notificationMessage && <NotificationMessage></NotificationMessage>}
         {user === null && (
           <LoginForm
             username={username}
@@ -203,7 +216,7 @@ const App = () => {
               </form>
             </div>
             <Togglable buttonLabel="new blog" ref={blogFormRef}>
-              <BlogForm createBlog={addBlog} />
+              <BlogForm createBlog={handleAddBlog} />
             </Togglable>
             <div>
               {blogs &&

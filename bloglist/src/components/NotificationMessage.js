@@ -2,7 +2,7 @@ import { useContext } from 'react'
 import BlogsContext from '../BlogsContext'
 
 const NotificationMessage = () => {
-  const [notificationMessage, notificationDispatch] = useContext(BlogsContext)
+  const [notificationMessage] = useContext(BlogsContext)
 
   const notificationStyle = {
     color: 'green',
