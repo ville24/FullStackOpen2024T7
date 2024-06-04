@@ -1,8 +1,9 @@
-import { useState, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import { useReducer } from 'react'
 import BlogsContext from './BlogsContext'
 import notificationReducer from './reducers/notificationReducer'
 import errorMessageReducer from './reducers/errorMessageReducer'
+import userReducer from './reducers/userReducer'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { getBlogs, createBlog, updateBlog, removeBlog } from './requests'
@@ -13,15 +14,13 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import ErrorMessage from './components/ErrorMessage'
 import NotificationMessage from './components/NotificationMessage'
-import blogService from './services/blogs'
-import loginService from './services/login'
 
 const App = () => {
-  const [username, setUsername] = useState('')
-  const [password, setPassword] = useState('')
-  const [user, setUser] = useState(null)
-  //const [errorMessage, setErrorMessage] = useState('')
   const blogFormRef = useRef()
+  const [user, userDispatch] = useReducer(
+    userReducer,
+    null
+  )
   const [notificationMessage, notificationDispatch] = useReducer(
     notificationReducer,
     null,
@@ -61,10 +60,6 @@ const App = () => {
       setTimeout(() => {
         errorMessageDispatch({ type: 'errorMessageHide', payload: null })
       }, 2000)
-      /*setErrorMessage(`Saving blog failed.`)
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 2000)*/
     },
   })
 
@@ -81,10 +76,13 @@ const App = () => {
       }, 2000)
     },
     onError: () => {
-      /*setErrorMessage(`Updating blog failed.`)
+      errorMessageDispatch({
+        type: 'errorMessageShow',
+        payload: `Updating blog failed.`,
+      })
       setTimeout(() => {
-        setErrorMessage(null)
-      }, 2000)*/
+        errorMessageDispatch({ type: 'errorMessageHide', payload: null })
+      }, 2000)
     },
   })
 
@@ -101,10 +99,13 @@ const App = () => {
       }, 2000)
     },
     onError: () => {
-      /*setErrorMessage('Deleting blog failed.')
+      errorMessageDispatch({
+        type: 'errorMessageShow',
+        payload: 'Deleting blog failed.',
+      })
       setTimeout(() => {
-        setErrorMessage(null)
-      }, 2000)*/
+        errorMessageDispatch({ type: 'errorMessageHide', payload: null })
+      }, 2000)
     },
   })
 
@@ -112,8 +113,10 @@ const App = () => {
     const loggedUserJSON = window.localStorage.getItem('loggedBlogappUser')
     if (loggedUserJSON) {
       const user = JSON.parse(loggedUserJSON)
-      blogService.setToken(user.token)
-      setUser(user)
+      userDispatch({
+        type: 'addUser',
+        payload: user,
+      })
     }
   }, [])
 
@@ -130,46 +133,14 @@ const App = () => {
     removeBlogMutation.mutate({ id: id, user: user })
   }
 
-  const handleUsernameChange = (event) => {
-    setUsername(event.target.value)
-  }
-
-  const handlePasswordChange = (event) => {
-    setPassword(event.target.value)
-  }
-
-  const handleLogin = async (event) => {
-    event.preventDefault()
-    try {
-      const user = await loginService.login({
-        username,
-        password,
-      })
-      window.localStorage.setItem('loggedBlogappUser', JSON.stringify(user))
-      blogService.setToken(user.token)
-      setUser(user)
-      setUsername('')
-      setPassword('')
-      notificationDispatch({
-        type: 'notificationShow',
-        payload: `User ${user.name} logged in`,
-      })
-      setTimeout(() => {
-        notificationDispatch({ type: 'notificationHide', payload: null })
-      }, 2000)
-    } catch (exception) {
-      /*setErrorMessage('wrong username or password')
-      setTimeout(() => {
-        setErrorMessage(null)
-      }, 2000)*/
-    }
-  }
-
   const handleLogout = async (event) => {
     event.preventDefault()
     try {
       window.localStorage.removeItem('loggedBlogappUser')
-      setUser(null)
+      userDispatch({
+        type: 'removeUser',
+        payload: null,
+      })
       notificationDispatch({
         type: 'notificationShow',
         payload: `User ${user.name} logged out`,
@@ -178,32 +149,30 @@ const App = () => {
         notificationDispatch({ type: 'notificationHide', payload: null })
       }, 2000)
     } catch (exception) {
-      /*setErrorMessage(`User ${user.name} logged failed`)
+      errorMessageDispatch({
+        type: 'errorMessageShow',
+        payload: `User ${user.name} logged failed`,
+      })
       setTimeout(() => {
-        setErrorMessage(null)
-      }, 2000)*/
+        errorMessageDispatch({ type: 'errorMessageHide', payload: null })
+      }, 2000)
     }
   }
-
+  
   return (
     <BlogsContext.Provider
-      value={
-        ([notificationMessage, notificationDispatch],
-        [errorMessage, errorMessageDispatch])
-      }
+        value={{
+          notification: [notificationMessage, notificationDispatch], 
+          error: [errorMessage, errorMessageDispatch],
+          user: [user, userDispatch]
+        }}
     >
       <div>
         <h2>blogs</h2>
-        {errorMessage && <ErrorMessage></ErrorMessage>}
-        {notificationMessage && <NotificationMessage></NotificationMessage>}
+        {errorMessage && <ErrorMessage />}
+        {notificationMessage && <NotificationMessage />}
         {user === null && (
-          <LoginForm
-            username={username}
-            password={password}
-            handleLogin={handleLogin}
-            handleUsernameChange={handleUsernameChange}
-            handlePasswordChange={handlePasswordChange}
-          ></LoginForm>
+          <LoginForm />
         )}
         {user && (
           <>

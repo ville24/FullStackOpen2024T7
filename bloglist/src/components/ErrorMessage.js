@@ -2,8 +2,7 @@ import { useContext } from 'react'
 import BlogsContext from '../BlogsContext'
 
 const ErrorMessage = () => {
-
-  const [errorMessage] = useContext(BlogsContext)
+  const {error: [errorMessage, errorMessageDispatch]} = useContext(BlogsContext)
 
   const errorStyle = {
     color: 'red',
