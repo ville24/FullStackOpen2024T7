@@ -1,21 +1,18 @@
-import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { useParams, useNavigate } from 'react-router-dom'
 
-const Blog = ({ blog, user, updateBlog, removeBlog }) => {
+const Blog = ({ blogs, user, updateBlog, removeBlog }) => {
   Blog.propTypes = {
-    blog: PropTypes.object.isRequired,
-    user: PropTypes.object.isRequired,
+    blogs: PropTypes.array.isRequired,
+    user: PropTypes.object,
     updateBlog: PropTypes.func.isRequired,
     removeBlog: PropTypes.func.isRequired,
   }
+  const navigate = useNavigate()
+  const id = useParams().id
 
-  const [visible, setVisible] = useState(false)
-
-  const showWhenVisible = { display: visible ? '' : 'none' }
-
-  const toggleVisibility = () => {
-    setVisible(!visible)
-  }
+  const blog = blogs && blogs.find(b => b.id === id)
+  !blog && navigate('/blogs')
 
   const blogStyle = {
     paddingTop: 10,
@@ -43,35 +40,47 @@ const Blog = ({ blog, user, updateBlog, removeBlog }) => {
       removeBlog(blog.id)
     }
   }
-
-  return (
-    <div style={blogStyle} className="blog">
-      <p>
-        <span>{blog.title}</span>
-        <span> </span>
-        <span>{blog.author}</span>
-        <button onClick={toggleVisibility} className="viewbutton">
-          view
-        </button>
-      </p>
-      <div style={showWhenVisible} className="blogDetails">
-        <button onClick={toggleVisibility}>hide</button>
-        <p>{blog.url}</p>
-        <p className="likes">
-          {blog.likes}{' '}
-          <button onClick={handleLike} className="likebutton">
-            like
-          </button>
-        </p>
-        <p>{blog.user.name}</p>
-        {user.username === blog.user.username && (
-          <button onClick={handleRemove} className="removebutton">
-            remove
-          </button>
-        )}
+  if (blog) {
+    return (
+      <div style={blogStyle} className="blog">
+        <h2>
+          <span>{blog.title}</span>
+          <span> </span>
+          <span>{blog.author}</span>
+        </h2>
+        <div>
+          <p><a href={blog.url}>{blog.url}</a></p>
+          <p className="likes">
+            {blog.likes}{' '}likes
+            {
+              user &&
+                <button onClick={handleLike} className="likebutton">
+                like
+              </button>
+            }
+          </p>
+          <p>Added by {blog.user.name}</p>
+          {user && user.username === blog.user.username && (
+            <button onClick={handleRemove} className="removebutton">
+              remove
+            </button>
+          )}
+          <h3>Comments</h3>
+          <ul>
+            {
+              blog.comments.map(comment => 
+                <li key={comment}>{comment}</li>
+            )}
+          </ul>
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
+  else {
+    return(
+      <></>
+    )
+  }
 }
 
 export default Blog

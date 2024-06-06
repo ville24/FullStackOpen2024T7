@@ -44,3 +44,8 @@ export const removeBlog = async (obj) => {
     const config = setConfig(obj)
     await axios.delete(baseUrl + '/api/blogs' + '/' + obj.id, config)
 }
+
+export const getUsers = async () => {
+    const response = axios.get(baseUrl + '/api/users')
+    return (await response).data
+}

@@ -6,7 +6,12 @@ import errorMessageReducer from './reducers/errorMessageReducer'
 import userReducer from './reducers/userReducer'
 
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { getBlogs, createBlog, updateBlog, removeBlog } from './requests'
+import { getBlogs, createBlog, updateBlog, removeBlog, getUsers } from './requests'
+
+import {
+  BrowserRouter as Router,
+  Routes, Route, Link, Navigate
+} from 'react-router-dom'
 
 import LoginForm from './components/LoginForm'
 import Blog from './components/Blog'
@@ -14,6 +19,7 @@ import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import ErrorMessage from './components/ErrorMessage'
 import NotificationMessage from './components/NotificationMessage'
+import UserBlogs from './components/UserBlogs'
 
 const App = () => {
   const blogFormRef = useRef()
@@ -31,13 +37,20 @@ const App = () => {
   )
 
   const queryClient = useQueryClient()
+
   const result = useQuery({
     queryKey: ['blogs'],
     queryFn: getBlogs,
     refetchOnWindowFocus: false,
   })
-
   const blogs = result.data
+
+  const resultUsers = useQuery({
+    queryKey: ['users'],
+    queryFn: getUsers,
+    refetchOnWindowFocus: false,
+  })
+  const users = resultUsers.data
 
   const newBlogMutation = useMutation({
     mutationFn: createBlog,
@@ -88,7 +101,7 @@ const App = () => {
 
   const removeBlogMutation = useMutation({
     mutationFn: removeBlog,
-    onSuccess: (updatedBlog) => {
+    onSuccess: () => {
       queryClient.invalidateQueries(['blogs'])
       notificationDispatch({
         type: 'notificationShow',
@@ -125,7 +138,8 @@ const App = () => {
     newBlogMutation.mutate({ newBlog: blogObject, user: user })
   }
 
-  const handleupdateBlog = (blogObject) => {
+  const handleUpdateBlog = (blogObject) => {
+    blogObject.comments = ['testtesttest']
     updateBlogMutation.mutate({ updateBlog: blogObject, user: user })
   }
 
@@ -158,53 +172,84 @@ const App = () => {
       }, 2000)
     }
   }
+
+  const padding = {
+    padding: 5
+  }
   
   return (
-    <BlogsContext.Provider
-        value={{
-          notification: [notificationMessage, notificationDispatch], 
-          error: [errorMessage, errorMessageDispatch],
-          user: [user, userDispatch]
-        }}
-    >
-      <div>
-        <h2>blogs</h2>
-        {errorMessage && <ErrorMessage />}
-        {notificationMessage && <NotificationMessage />}
-        {user === null && (
-          <LoginForm />
-        )}
-        {user && (
-          <>
+    <Router>
+      <BlogsContext.Provider
+          value={{
+            notification: [notificationMessage, notificationDispatch], 
+            error: [errorMessage, errorMessageDispatch],
+            user: [user, userDispatch]
+          }}
+      >
+        <div>
+          <Link style={padding} to="/blogs">blogs</Link>
+          <Link style={padding} to="/users">users</Link>
+          {user === null && (
+            <LoginForm />
+          )}
+          {user &&
+              <>
+                {user.name} logged in
+                <form onSubmit={handleLogout} style={{ display: 'inline' }}>
+                  <button type="submit" id="logoutbutton">
+                    logout
+                  </button>
+                </form>
+              </>}
+          {errorMessage && <ErrorMessage />}
+          {notificationMessage && <NotificationMessage />}
+        </div>
+        <Routes>
+          <Route path="/" element={<Navigate replace to="/blogs" />} />
+          <Route path="/blogs" element={
             <div>
-              {user.name} logged in
-              <form onSubmit={handleLogout} style={{ display: 'inline' }}>
-                <button type="submit" id="logoutbutton">
-                  logout
-                </button>
-              </form>
+              <h1>Blogs</h1>
+              {
+                user &&
+                <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                  <BlogForm createBlog={handleAddBlog} />
+                </Togglable>
+              }
+              <div>
+                {blogs && blogs.map(blog =>
+                  <div key={blog.id}><Link to={`/blogs/${blog.id}`}>{blog.title}</Link></div>
+                )}
+              </div>
             </div>
-            <Togglable buttonLabel="new blog" ref={blogFormRef}>
-              <BlogForm createBlog={handleAddBlog} />
-            </Togglable>
+          } />
+          <Route path="/blogs/:id" element={<Blog blogs={blogs} user={user} updateBlog={handleUpdateBlog} removeBlog={handleRemoveBlog} />} />
+          <Route path="/users/:id" element={<UserBlogs users={users} />} />
+          <Route path="/users" element={
             <div>
-              {blogs &&
-                blogs
-                  .sort((a, b) => b.likes - a.likes)
-                  .map((blog) => (
-                    <Blog
-                      key={blog.id}
-                      blog={blog}
-                      user={user}
-                      updateBlog={handleupdateBlog}
-                      removeBlog={handleRemoveBlog}
-                    />
+              <h1>Users</h1>
+              <table>
+                <thead>
+                  <tr>
+                    <th></th>
+                    <th>blogs created</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {users && users.map((user) => (
+                    <tr key={user.id}>
+                      <td>
+                        <Link to={`/users/${user.id}`}>{user.name}</Link>
+                        </td>
+                      <td>{user.blogs.length}</td>
+                    </tr>
                   ))}
+                </tbody>
+              </table>
             </div>
-          </>
-        )}
-      </div>
-    </BlogsContext.Provider>
+          } />
+        </Routes>
+      </BlogsContext.Provider>
+    </Router>
   )
 }
 
