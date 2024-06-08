@@ -24,11 +24,13 @@ import {
 } from 'react-router-dom'
 
 import LoginForm from './components/LoginForm'
+import Blogs from './components/Blogs'
 import Blog from './components/Blog'
 import BlogForm from './components/BlogForm'
 import Togglable from './components/Togglable'
 import ErrorMessage from './components/ErrorMessage'
 import NotificationMessage from './components/NotificationMessage'
+import Users from './components/Users'
 import UserBlogs from './components/UserBlogs'
 
 const App = () => {
@@ -218,6 +220,8 @@ const App = () => {
           notification: [notificationMessage, notificationDispatch],
           error: [errorMessage, errorMessageDispatch],
           user: [user, userDispatch],
+          users: [users],
+          blogs: [blogs],
         }}
       >
         <div>
@@ -253,14 +257,7 @@ const App = () => {
                     <BlogForm createBlog={handleAddBlog} />
                   </Togglable>
                 )}
-                <div>
-                  {blogs &&
-                    blogs.map((blog) => (
-                      <div key={blog.id}>
-                        <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-                      </div>
-                    ))}
-                </div>
+                <Blogs />
               </div>
             }
           />
@@ -268,42 +265,14 @@ const App = () => {
             path="/blogs/:id"
             element={
               <Blog
-                blogs={blogs}
-                user={user}
                 updateBlog={handleUpdateBlog}
                 removeBlog={handleRemoveBlog}
                 updateComment={handleUpdateComment}
               />
             }
           />
-          <Route path="/users/:id" element={<UserBlogs users={users} />} />
-          <Route
-            path="/users"
-            element={
-              <div>
-                <h1>Users</h1>
-                <table>
-                  <thead>
-                    <tr>
-                      <th></th>
-                      <th>blogs created</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {users &&
-                      users.map((user) => (
-                        <tr key={user.id}>
-                          <td>
-                            <Link to={`/users/${user.id}`}>{user.name}</Link>
-                          </td>
-                          <td>{user.blogs.length}</td>
-                        </tr>
-                      ))}
-                  </tbody>
-                </table>
-              </div>
-            }
-          />
+          <Route path="/users/:id" element={<UserBlogs />} />
+          <Route path="/users" element={<Users />} />
         </Routes>
       </BlogsContext.Provider>
     </Router>
