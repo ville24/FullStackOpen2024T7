@@ -224,56 +224,58 @@ const App = () => {
           blogs: [blogs],
         }}
       >
-        <div>
-          <Link style={padding} to="/blogs">
-            blogs
-          </Link>
-          <Link style={padding} to="/users">
-            users
-          </Link>
-          {user === null && <LoginForm />}
-          {user && (
-            <>
-              {user.name} logged in
-              <form onSubmit={handleLogout} style={{ display: 'inline' }}>
-                <button type="submit" id="logoutbutton">
-                  logout
-                </button>
-              </form>
-            </>
-          )}
-          {errorMessage && <ErrorMessage />}
-          {notificationMessage && <NotificationMessage />}
+        <div className='container'>
+          <div>
+            <Link style={padding} to="/blogs">
+              blogs
+            </Link>
+            <Link style={padding} to="/users">
+              users
+            </Link>
+            {user === null && <LoginForm />}
+            {user && (
+              <>
+                {user.name} logged in
+                <form onSubmit={handleLogout} style={{ display: 'inline' }}>
+                  <button type="submit" id="logoutbutton">
+                    logout
+                  </button>
+                </form>
+              </>
+            )}
+            {errorMessage && <ErrorMessage />}
+            {notificationMessage && <NotificationMessage />}
+          </div>
+          <Routes>
+            <Route path="/" element={<Navigate replace to="/blogs" />} />
+            <Route
+              path="/blogs"
+              element={
+                <div>
+                  <h1>Blogs</h1>
+                  {user && (
+                    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                      <BlogForm createBlog={handleAddBlog} />
+                    </Togglable>
+                  )}
+                  <Blogs />
+                </div>
+              }
+            />
+            <Route
+              path="/blogs/:id"
+              element={
+                <Blog
+                  updateBlog={handleUpdateBlog}
+                  removeBlog={handleRemoveBlog}
+                  updateComment={handleUpdateComment}
+                />
+              }
+            />
+            <Route path="/users/:id" element={<UserBlogs />} />
+            <Route path="/users" element={<Users />} />
+          </Routes>
         </div>
-        <Routes>
-          <Route path="/" element={<Navigate replace to="/blogs" />} />
-          <Route
-            path="/blogs"
-            element={
-              <div>
-                <h1>Blogs</h1>
-                {user && (
-                  <Togglable buttonLabel="new blog" ref={blogFormRef}>
-                    <BlogForm createBlog={handleAddBlog} />
-                  </Togglable>
-                )}
-                <Blogs />
-              </div>
-            }
-          />
-          <Route
-            path="/blogs/:id"
-            element={
-              <Blog
-                updateBlog={handleUpdateBlog}
-                removeBlog={handleRemoveBlog}
-                updateComment={handleUpdateComment}
-              />
-            }
-          />
-          <Route path="/users/:id" element={<UserBlogs />} />
-          <Route path="/users" element={<Users />} />
-        </Routes>
       </BlogsContext.Provider>
     </Router>
   )
