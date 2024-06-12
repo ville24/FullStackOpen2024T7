@@ -1,7 +1,7 @@
 import axios from 'axios'
 
-const baseUrl = 'http://localhost:3003'
-//const baseUrl = 'https://didactic-train-wx6prvp5vp7c5569-3000.app.github.dev'
+//const baseUrl = 'http://localhost:3003'
+const baseUrl = 'https://didactic-train-wx6prvp5vp7c5569-3000.app.github.dev'
 
 const setToken = (newToken) => {
   return `Bearer ${newToken}`

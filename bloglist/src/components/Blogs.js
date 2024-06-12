@@ -1,6 +1,7 @@
 import { useContext } from 'react'
 import BlogsContext from '../BlogsContext'
 import { Link } from 'react-router-dom'
+import { Table } from 'react-bootstrap'
 
 const Blogs = () => {
   const {
@@ -8,14 +9,18 @@ const Blogs = () => {
   } = useContext(BlogsContext)
 
   return (
-    <div>
+    <Table>
       {blogs &&
         blogs.map((blog) => (
-          <div key={blog.id}>
-            <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
-          </div>
+          <tbody key={blog.id}>
+            <tr>
+              <td>
+                <Link to={`/blogs/${blog.id}`}>{blog.title}</Link>
+              </td>
+            </tr>
+          </tbody>
         ))}
-    </div>
+    </Table>
   )
 }
 

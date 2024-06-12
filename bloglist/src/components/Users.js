@@ -1,5 +1,6 @@
 import { useContext } from 'react'
 import BlogsContext from '../BlogsContext'
+import { Table } from 'react-bootstrap'
 
 import { Link } from 'react-router-dom'
 
@@ -10,11 +11,11 @@ const Users = () => {
   return (
     <div>
       <h1>Users</h1>
-      <table>
+      <Table>
         <thead>
           <tr>
-            <th></th>
-            <th>blogs created</th>
+            <th>User</th>
+            <th>Blogs created</th>
           </tr>
         </thead>
         <tbody>
@@ -28,7 +29,7 @@ const Users = () => {
               </tr>
             ))}
         </tbody>
-      </table>
+      </Table>
     </div>
   )
 }

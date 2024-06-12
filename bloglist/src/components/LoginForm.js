@@ -2,6 +2,7 @@ import { useState, useContext } from 'react'
 import { useMutation } from '@tanstack/react-query'
 import BlogsContext from '../BlogsContext'
 import { login } from '../requests'
+import { Form, Button } from 'react-bootstrap'
 
 const LoginForm = () => {
   const {
@@ -57,32 +58,32 @@ const LoginForm = () => {
 
   return (
     <div>
-      <h2>Log in to application</h2>
-      <form onSubmit={handleLogin}>
-        <div>
-          username
-          <input
+      <h2 className="my-3">Log in to application</h2>
+      <Form onSubmit={handleLogin} style={{maxWidth: "20em"}}>
+        <Form.Group>
+        <Form.Label>Username:</Form.Label>
+          <Form.Control
             type="text"
             value={username}
             name="Username"
             id="username"
             onChange={handleUsernameChange}
           />
-        </div>
-        <div>
-          password
-          <input
+        </Form.Group>
+        <Form.Group>
+          <Form.Label>Password:</Form.Label>
+          <Form.Control
             type="password"
             value={password}
             name="Password"
             id="password"
             onChange={handlePasswordChange}
           />
-        </div>
-        <button type="submit" id="login-button">
+        </Form.Group>
+        <Button className="my-3" type="submit" id="login-button">
           login
-        </button>
-      </form>
+        </Button>
+      </Form>
     </div>
   )
 }

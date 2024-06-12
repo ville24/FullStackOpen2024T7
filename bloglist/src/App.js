@@ -23,6 +23,8 @@ import {
   Navigate,
 } from 'react-router-dom'
 
+import { Navbar, Nav, Button } from 'react-bootstrap'
+
 import LoginForm from './components/LoginForm'
 import Blogs from './components/Blogs'
 import Blog from './components/Blog'
@@ -226,24 +228,37 @@ const App = () => {
       >
         <div className='container'>
           <div>
-            <Link style={padding} to="/blogs">
-              blogs
-            </Link>
-            <Link style={padding} to="/users">
-              users
-            </Link>
+            <Navbar collapseOnSelect expand="lg" bg="light" variant="light" className="mb-3">
+              <Navbar.Toggle aria-controls="responsive-navbar-nav" />
+              <Navbar.Collapse id="responsive-navbar-nav">
+                <Nav className="mr-auto">
+                  <Nav.Link href="#" as="span" className="my-1">
+                    <Link style={padding} to="/blogs">
+                      Blogs
+                    </Link>
+                  </Nav.Link>
+                  <Nav.Link href="#" as="span" className="my-1">
+                    <Link style={padding} to="/users">
+                      Users
+                    </Link>
+                  </Nav.Link>
+                  <Nav.Link href="#" as="span">
+                    {user && (
+                      <div>
+                        {user.name} logged in
+                        <form onSubmit={handleLogout} style={{ display: 'inline' }}>
+                          <Button type="submit" id="logoutbutton" className="mx-3">
+                            Logout
+                          </Button>
+                        </form>
+                      </div>
+                    )}
+                  </Nav.Link>
+                </Nav>
+              </Navbar.Collapse>
+            </Navbar>
             {user === null && <LoginForm />}
-            {user && (
-              <>
-                {user.name} logged in
-                <form onSubmit={handleLogout} style={{ display: 'inline' }}>
-                  <button type="submit" id="logoutbutton">
-                    logout
-                  </button>
-                </form>
-              </>
-            )}
-            {errorMessage && <ErrorMessage />}
+                {errorMessage && <ErrorMessage />}
             {notificationMessage && <NotificationMessage />}
           </div>
           <Routes>
@@ -254,7 +269,7 @@ const App = () => {
                 <div>
                   <h1>Blogs</h1>
                   {user && (
-                    <Togglable buttonLabel="new blog" ref={blogFormRef}>
+                    <Togglable buttonLabel="New blog" ref={blogFormRef}>
                       <BlogForm createBlog={handleAddBlog} />
                     </Togglable>
                   )}

@@ -3,6 +3,7 @@ import { useState } from 'react'
 import { useParams, Navigate } from 'react-router-dom'
 import { useContext } from 'react'
 import BlogsContext from '../BlogsContext'
+import { Form, Button } from 'react-bootstrap'
 
 const Blog = ({ updateBlog, removeBlog, updateComment }) => {
   Blog.propTypes = {
@@ -19,14 +20,6 @@ const Blog = ({ updateBlog, removeBlog, updateComment }) => {
   const id = useParams().id
 
   const blog = blogs && blogs.find((b) => b.id === id)
-
-  const blogStyle = {
-    paddingTop: 10,
-    paddingLeft: 2,
-    border: 'solid',
-    borderWidth: 1,
-    marginBottom: 5,
-  }
 
   const handleLike = (event) => {
     event.preventDefault()
@@ -54,7 +47,7 @@ const Blog = ({ updateBlog, removeBlog, updateComment }) => {
   }
 
   return blog ? (
-    <div style={blogStyle} className="blog">
+    <div className="blog">
       <h2>
         <span>{blog.title}</span>
         <span> </span>
@@ -65,34 +58,37 @@ const Blog = ({ updateBlog, removeBlog, updateComment }) => {
           <a href={blog.url}>{blog.url}</a>
         </p>
         <p className="likes">
-          {blog.likes} likes
+          <span className="pr-3">{blog.likes} likes</span> <span> </span>
           {user && (
-            <button onClick={handleLike} className="likebutton">
-              like
-            </button>
+            <Button onClick={handleLike} className="ml-3">
+              Like
+            </Button>
           )}
         </p>
         <p>Added by {blog.user.name}</p>
         {user && user.username === blog.user.username && (
-          <button onClick={handleRemove} className="removebutton">
+          <Button onClick={handleRemove} className="removebutton">
             remove
-          </button>
+          </Button>
         )}
-        <h3>Comments</h3>
-        <form onSubmit={handleComment}>
+        <h3 className="my-3">Comments</h3>
+        <Form onSubmit={handleComment}>
           <div>
-            <input
+            <Form.Control
               type="text"
               value={comment}
               name="title"
               onChange={({ target }) => setComment(target.value)}
+              style={{maxWidth: "30em"}}
+              className="float-start"
             />
-            <button type="submit" id="addComment">
+            <div className="float-start mx-1">&nbsp;</div>
+            <Button type="submit" id="addComment" className="float-start">
               Add comment
-            </button>
+            </Button>
           </div>
-        </form>
-        <ul>
+        </Form>
+        <ul className="float-start mt-3" style={{clear: "both"}}>
           {blog.comments.map((comment, index) => (
             <li key={index}>{comment}</li>
           ))}

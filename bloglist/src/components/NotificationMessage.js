@@ -1,24 +1,14 @@
 import { useContext } from 'react'
 import BlogsContext from '../BlogsContext'
+import { Alert } from 'react-bootstrap'
 
 const NotificationMessage = () => {
   const {notification: [notificationMessage, notificationDispatch]} = useContext(BlogsContext)
 
-  const notificationStyle = {
-    color: 'green',
-    fontSize: 20,
-    padding: 5,
-    marginBottom: 10,
-    borderWidth: 2,
-    borderStyle: 'solid',
-    borderColor: 'green',
-    borderRadius: 5,
-    backgroundColor: 'lightGray',
-  }
   return (
-    <div style={notificationStyle} className="info">
+    <Alert variant="success">
       {notificationMessage}
-    </div>
+    </Alert>
   )
 }
 export default NotificationMessage
