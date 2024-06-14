@@ -1,7 +1,6 @@
 import axios from 'axios'
 
-//const baseUrl = 'http://localhost:3003'
-const baseUrl = 'https://didactic-train-wx6prvp5vp7c5569-3000.app.github.dev'
+const baseUrl = 'http://localhost:3003'
 
 const setToken = (newToken) => {
   return `Bearer ${newToken}`
@@ -11,11 +10,6 @@ const setConfig = (obj) => {
   return {
     headers: {
       Authorization: setToken(obj.user.token),
-      'Access-Control-Allow-Origin': '*',
-      'Access-Control-Allow-Credentials': 'true',
-      'Access-Control-Allow-Headers':
-        'Origin, Content-Type, X-Amz-Date, Authorization, X-Api-Key, X-Amz-Security-Token, locale',
-      'Access-Control-Allow-Methods': 'GET, POST',
     },
   }
 }
